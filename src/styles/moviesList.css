@@ -1,0 +1,32 @@
+.mainDiv{
+    background: url('/src/assets/images/bg-img.jpg');
+    background-position:bottom;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: cover;
+    height: 100%;
+}
+.parrentBox{
+    width: 80%;
+}
+
+.movieBox{
+    width: 282px;
+    height: 500px;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 12px;
+}
+
+.movieBox:hover{
+    cursor: pointer;
+}
+
+.logInBtn{
+    width: 32px;
+    height: 32px;
+    background-color: rgba(43, 209, 126, 1);
+}
+
+.logInButtonNext {
+    background-color: rgba(0, 0, 0, 0.2);
+}
