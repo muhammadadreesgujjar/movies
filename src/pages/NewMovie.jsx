@@ -5,6 +5,7 @@ import { useContext } from "react";
 import ContextApi from "../context/ContextApi";
 import { useNavigate } from "react-router-dom";
 import { getItem, setItem } from "../helpers/utils/localStorage";
+import InputField from "../components/InputField";
 
 const NewMovie = () => {
   const context = useContext(ContextApi);
@@ -14,7 +15,10 @@ const NewMovie = () => {
     name: "",
     publishYear: "",
   });
-
+  const [error, setError] = useState({
+    name: null,
+    publishYear: null,
+  });
   useEffect(() => {
     const getuserMail = getItem("userMail");
     if (!getuserMail) {
@@ -33,17 +37,58 @@ const NewMovie = () => {
     }
   }, []);
 
-  const handleChange = (e) => {
-    console.log("inputValue --- ", inputValue);
-    setInputValue((prevValue) => {
-      return { ...prevValue, [e.target.name]: e.target.value };
+  // const handleChange = (e) => {
+  //   console.log("inputValue --- ", inputValue);
+  //   setInputValue((prevValue) => {
+  //     return { ...prevValue, [e.target.name]: e.target.value };
+  //   });
+  // };
+
+  const handlechange = (e) => {
+    console.log("changing ....", e.target.name);
+    setInputValue((prevVal) => {
+      return { ...prevVal, [e.target.name]: e.target.value };
     });
+
+    // if (e.target.name == "name" && e.target.value.length == 0) {
+    //   console.log(
+    //     "Name ---- ",
+    //     e.target.name,
+    //     " --- || --- ",
+    //     e.target.value.length
+    //   );
+    //   setError({
+    //     email: "Name is required.",
+    //     password: null,
+    //   });
+    //   return;
+    // }
+    // if (
+    //   e.target.name == "name" &&
+    //   e.target.value.length > 0 &&
+    //   e.target.value.length < 25
+    // ) {
+    //   setError({
+    //     email: null,
+    //     password: "Password length should less than 25.",
+    //   });
+    //   return;
+    // }
+
+    // if (e.target.name == "publishYear" && isNaN(e.target.value)) {
+    //   setError({
+    //     email: null,
+    //     password: "Publish Year Should be number",
+    //   });
+    //   return;
+    // }
   };
 
   const handleSubmit = () => {
     const { state, setState } = context;
-    if (inputValue.name == "" || inputValue.publishYear == "") {
-      alert("Name or Year is missing!!!");
+    const valid = Validate(inputValue, setError);
+    if (!valid) {
+      return;
     } else {
       const obj = {
         id: uuidv4(),
@@ -127,26 +172,20 @@ const NewMovie = () => {
                 </button>
               </div>
             </div>
-            <div className="flex flex-col gap-5">
-              <input
-                type="name"
+            <div className="flex flex-col gap-5 w-full">
+              <InputField
                 name="name"
-                id="name"
-                value={inputValue.name}
-                onChange={handleChange}
-                placeholder="Title"
-                required
-                className="inputFieldOne md:w-80 h-12 w-56 block rounded-md px-3 py-1.5 text-base text-white placeholder:text-white focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-none sm:text-sm/6"
+                value={inputValue.value}
+                onchange={handlechange}
+                placeholder="Name"
+                err={error.name}
               />
-              <input
-                type="publishYear"
+              <InputField
                 name="publishYear"
-                id="publishYear"
                 value={inputValue.publishYear}
-                onChange={handleChange}
+                onchange={handlechange}
                 placeholder="Publish Year"
-                required
-                className="inputFieldOne md:w-80 md:h-12 w-56 block rounded-md px-3 py-1.5 text-base text-white outline-gray-300 placeholder:text-white focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-none sm:text-sm/6"
+                err={error.publishYear}
               />
               <div className="flex gap-3">
                 <button
@@ -173,3 +212,56 @@ const NewMovie = () => {
 };
 
 export default NewMovie;
+
+function Validate(inputValue, setError) {
+  let isValid = true;
+  if (inputValue.name.length < 25) {
+    setError((prev) => ({
+      ...prev,
+      name: null,
+    }));
+    isValid = true;
+  }
+
+  if (!isNaN(inputValue.publishYear)) {
+    setError((prev) => ({
+      ...prev,
+      publishYear: null,
+    }));
+    isValid = true;
+  }
+
+  if (inputValue.name == "") {
+    setError((prev) => ({
+      ...prev,
+      name: "Name is required.",
+    }));
+    isValid = false;
+  }
+
+  if (inputValue.publishYear == "") {
+    setError((prev) => ({
+      ...prev,
+      publishYear: "Publish Year is required.",
+    }));
+    isValid = false;
+  }
+
+  if (inputValue.name.length > 25) {
+    setError((prev) => ({
+      ...prev,
+      name: "Name length should be less than 25.",
+    }));
+    isValid = false;
+  }
+
+  if (isNaN(inputValue.publishYear)) {
+    setError((prev) => ({
+      ...prev,
+      publishYear: "Publish Year is not a number.",
+    }));
+    isValid = false;
+  }
+
+  return isValid;
+}
