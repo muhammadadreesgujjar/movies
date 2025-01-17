@@ -9,7 +9,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCirclePlus } from "@fortawesome/free-solid-svg-icons";
 
 const MoviesList = () => {
-  const [imagesPath, setImagesPath] = useState([]);
+  const [page, setPage] = useState(0);
   const navigate = useNavigate();
   const { state, setState } = useContext(ContextApi);
 
@@ -38,37 +38,40 @@ const MoviesList = () => {
 
   useEffect(() => {
     const storedArr = getItem("movies");
-
     if (!storedArr) {
       setItem("movies", state);
-      setImagesPath(state);
+      // setImagesPath(state);
       return;
     }
-    // setState(storedArr);
-    setImagesPath(storedArr);
-
-    // if (!storedArr) {
-    //   setItem('movies',state);
-    //   setImagesPath(state);
-    //   return;
-    // }
-    // if (state.length < storedArr.length) {
-    //   setState(storedArr);
-    //   setImagesPath(state);
-    // }
-    // if (state.length > storedArr.length) {
-    //   setItem('movies',state);
-    //   setImagesPath(state);
-    // }
-    // setItem('movies',state);
+    // setImagesPath(storedArr);
   }, [state]);
 
-  useEffect(() => {
-    setImagesPath(state);
-  }, [state]);
+  // useEffect(() => {
+  //   setImagesPath(state);
+  // }, [state]);
 
   const handleClick = () => {
     navigate("/newmovie");
+  };
+
+  const handleNext = () => {
+    setPage((prev) => {
+      if (state.length < page * 8 + 8) {
+        return prev;
+      } else {
+        return prev + 1;
+      }
+    });
+  };
+
+  const handlePrev = () => {
+    setPage((prev) => {
+      if (page == 0) {
+        return prev;
+      } else {
+        return prev - 1;
+      }
+    });
   };
 
   return (
@@ -84,7 +87,7 @@ const MoviesList = () => {
         </div>
         <div className="flex flex-col gap-4 w-full">
           <div className="flex flex-wrap flex-col md:flex-row gap-5  w-full">
-            {imagesPath.map((item, index) => (
+            {state.slice(page * 8, page * 8 + 8).map((item, index) => (
               <div key={index}>
                 <MovieCard
                   id={item.id}
@@ -98,17 +101,43 @@ const MoviesList = () => {
         </div>
         <div className="my-9">
           <div className="flex justify-center gap-3">
-            <p className="text-center leading-6 text-xl">Prev</p>
-            <button type="button" className="logInBtn rounded-md font-semibold">
-              1
-            </button>
-            <button
-              type="button"
-              className="logInBtn logInButtonNext rounded-md font-semibold"
+            <p
+              className="text-center leading-6 text-xl hover:cursor-pointer"
+              onClick={handlePrev}
             >
-              2
-            </button>
-            <p className="text-center leading-6 text-xl">Next</p>
+              Prev
+            </p>
+            {state.map((item, index) => {
+              if (state.length > index * 8) {
+                if (index == page) {
+                  return (
+                    <button
+                      key={index}
+                      type="button"
+                      className="bg-[#2bd17ed9] py-1 px-3 rounded-md font-semibold"
+                    >
+                      {index + 1}
+                    </button>
+                  );
+                }
+                return (
+                  <button
+                    key={index}
+                    type="button"
+                    className="bg-[black] py-1 px-3 rounded-md font-semibold"
+                    onClick={() => setPage(index)}
+                  >
+                    {index + 1}
+                  </button>
+                );
+              }
+            })}
+            <p
+              className="text-center leading-6 text-xl hover:cursor-pointer"
+              onClick={handleNext}
+            >
+              Next
+            </p>
           </div>
         </div>
       </div>

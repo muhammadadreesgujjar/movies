@@ -15,6 +15,10 @@ const EditMovie = () => {
     publishYear: "",
     img: "",
   });
+  const [error, setError] = useState({
+    name: null,
+    publishYear: null,
+  });
   const [searchParams] = useSearchParams();
   const paramValue = searchParams.get("id");
 
@@ -39,6 +43,10 @@ const EditMovie = () => {
   const handleSubmit = () => {
     const { state, setState } = context;
     const value = state.find((item) => item.id == paramValue);
+    const valid = Validate(inputValue, setError);
+    if (!valid) {
+      return;
+    }
     const updatedArray = state.map((item) => {
       if (item.id == value.id) {
         return {
@@ -167,3 +175,56 @@ const EditMovie = () => {
 };
 
 export default EditMovie;
+
+function Validate(inputValue, setError) {
+  let isValid = true;
+  if (inputValue.name.length < 25) {
+    setError((prev) => ({
+      ...prev,
+      name: null,
+    }));
+    isValid = true;
+  }
+
+  if (!isNaN(inputValue.publishYear)) {
+    setError((prev) => ({
+      ...prev,
+      publishYear: null,
+    }));
+    isValid = true;
+  }
+
+  if (inputValue.name == "") {
+    setError((prev) => ({
+      ...prev,
+      name: "Name is required.",
+    }));
+    isValid = false;
+  }
+
+  if (inputValue.publishYear == "") {
+    setError((prev) => ({
+      ...prev,
+      publishYear: "Publish Year is required.",
+    }));
+    isValid = false;
+  }
+
+  if (inputValue.name.length > 25) {
+    setError((prev) => ({
+      ...prev,
+      name: "Name length should be less than 25.",
+    }));
+    isValid = false;
+  }
+
+  if (isNaN(inputValue.publishYear)) {
+    setError((prev) => ({
+      ...prev,
+      publishYear: "Publish Year is not a number.",
+    }));
+    isValid = false;
+  }
+
+  return isValid;
+}
