@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import ViewCard from "../components/ViewCard";
+import { getItem } from "../helpers/utils/localStorage";
 
 const ViewMovie = () => {
   useEffect(() => {
