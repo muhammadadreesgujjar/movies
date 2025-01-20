@@ -8,7 +8,7 @@ import ContextApi from "../context/ContextApi";
 import { setItem } from "../helpers/utils/localStorage";
 import Modal from "../components/Modal";
 
-const MovieCard = ({ id, imgSrc, name, publishYear }) => {
+const MovieCard = ({ id, imgSrc, name, publishYear, permision }) => {
   const [openModal, setOpenModal] = useState(false);
   const { state, setState } = useContext(ContextApi);
   const navigate = useNavigate();
@@ -43,7 +43,10 @@ const MovieCard = ({ id, imgSrc, name, publishYear }) => {
         setOpen={setOpenModal}
         deleteItem={() => handleDelete(id)}
       />
-      <div className="movieBox p-2" onClick={() => handleBox(id)}>
+      <div
+        className="movieBox p-2"
+        onClick={permision.view ? () => handleBox(id) : null}
+      >
         <div className="h-4/5 rounded-xl relative">
           <img
             src={imgSrc}
@@ -53,19 +56,25 @@ const MovieCard = ({ id, imgSrc, name, publishYear }) => {
             className="object-cover h-full rounded-xl"
           />
           <div className="absolute top-3 right-2">
-            <span
-              className="p-2 px-3 rounded-md border-red-500 border-2 mx-2"
-              onClick={handleModal}
-              // onClick={(e) => handleDelete(e, id)}
-            >
-              <FontAwesomeIcon icon={faTrash} className="text-red-500" />
-            </span>
-            <span
-              className="p-2 px-3 rounded-md border-gray-500 border-2 mx-2"
-              onClick={(e) => handleEdit(e, id)}
-            >
-              <FontAwesomeIcon icon={faPenToSquare} className="text-gray-500" />
-            </span>
+            {permision.delete && (
+              <span
+                className="p-2 px-3 rounded-md border-red-500 border-2 mx-2"
+                onClick={handleModal}
+              >
+                <FontAwesomeIcon icon={faTrash} className="text-red-500" />
+              </span>
+            )}
+            {permision.update && (
+              <span
+                className="p-2 px-3 rounded-md border-gray-500 border-2 mx-2"
+                onClick={(e) => handleEdit(e, id)}
+              >
+                <FontAwesomeIcon
+                  icon={faPenToSquare}
+                  className="text-gray-500"
+                />
+              </span>
+            )}
           </div>
         </div>
         <div className="flex flex-col justify-around items-start h-1/5">

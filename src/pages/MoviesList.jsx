@@ -10,8 +10,14 @@ import { faCirclePlus } from "@fortawesome/free-solid-svg-icons";
 
 const MoviesList = () => {
   const [page, setPage] = useState(0);
-  const navigate = useNavigate();
   const { state, setState } = useContext(ContextApi);
+  const [permision, setPermision] = useState({
+    username: null,
+    email: null,
+    password: null,
+    confirmPassword: null,
+  });
+  const navigate = useNavigate();
 
   useEffect(() => {
     const getuserMail = getItem("userMail");
@@ -29,7 +35,7 @@ const MoviesList = () => {
       navigate("/signIn");
       return;
     }
-
+    setPermision({ ...findUser.permisions });
     const storedArr = getItem("movies");
     if (storedArr) {
       setState(storedArr);
@@ -40,15 +46,9 @@ const MoviesList = () => {
     const storedArr = getItem("movies");
     if (!storedArr) {
       setItem("movies", state);
-      // setImagesPath(state);
       return;
     }
-    // setImagesPath(storedArr);
   }, [state]);
-
-  // useEffect(() => {
-  //   setImagesPath(state);
-  // }, [state]);
 
   const handleClick = () => {
     navigate("/newmovie");
@@ -80,9 +80,11 @@ const MoviesList = () => {
         <div className="flex flex-col md:flex-row justify-between w-full">
           <h1 className="text-3xl font-semibold flex items-center justify-center gap-2">
             My movies
-            <span onClick={handleClick} className="hover:cursor-pointer">
-              <FontAwesomeIcon icon={faCirclePlus} />
-            </span>
+            {permision.create && (
+              <span onClick={handleClick} className="hover:cursor-pointer">
+                <FontAwesomeIcon icon={faCirclePlus} />
+              </span>
+            )}
           </h1>
         </div>
         <div className="flex flex-col gap-4 w-full">
@@ -94,6 +96,7 @@ const MoviesList = () => {
                   imgSrc={item.img}
                   name={item.name}
                   publishYear={item.publishYear}
+                  permision={permision}
                 />
               </div>
             ))}

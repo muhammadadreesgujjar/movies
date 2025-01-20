@@ -16,6 +16,7 @@ export default function NavBar() {
   const handleSignOut = () => {
     removeItem("userMail");
     navigate("/");
+    window.location.reload();
   };
 
   return (
