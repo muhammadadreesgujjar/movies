@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import "../styles/signIn.css";
 import InputField from "../components/InputField";
 import { useNavigate } from "react-router-dom";
@@ -12,29 +12,18 @@ const SignUpPage = () => {
     password: null,
     confirmPassword: null,
   });
-  useEffect(() => {
-    // const getuserMail = getItem("userMail");
-    // if (!getuserMail) {
-    //   navigate("/signIn");
-    //   return;
-    // }
-    // const users = getItem("users");
-    // if (!users) {
-    //   navigate("/signIn");
-    //   return;
-    // }
-    // const findUser = users.find((item) => item.email == getuserMail);
-    // if (!findUser) {
-    //   navigate("/signIn");
-    //   return;
-    // }
-    // navigate("/");
-  }, []);
+
   const [inputValue, setInputValue] = useState({
     username: "",
     email: "",
     password: "",
     confirmPassword: "",
+    permisions: {
+      view: false,
+      create: false,
+      update: false,
+      delete: false,
+    },
   });
 
   const handlechange = (e) => {
@@ -232,7 +221,7 @@ const SignUpPage = () => {
           Already have an account?
           <a
             href="/signIn"
-            className="ml-1 
+            className="ml-1
             decoration-blue-500 text-blue-600"
           >
             SignIn

@@ -6,6 +6,7 @@ import NewMovie from "../src/pages/NewMovie";
 import EditMovie from "../src/pages/EditMovie";
 import ContextApi from "./context/ContextApi";
 import ViewMovie from "./pages/ViewMovie";
+import AdminTabel from "./pages/AdminTabel";
 
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { useState } from "react";
@@ -25,6 +26,7 @@ function App() {
           <Route path="/newmovie" element={<NewMovie />} />
           <Route path="/editmovie" element={<EditMovie />} />
           <Route path="/viewmovie" element={<ViewMovie />} />
+          <Route path="/admin" element={<AdminTabel />} />
         </Routes>
       </Router>
     </ContextApi.Provider>
