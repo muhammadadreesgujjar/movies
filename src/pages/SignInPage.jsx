@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from "react";
 import "../styles/signIn.css";
 import InputField from "../components/InputField";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { getItem, setItem } from "../helpers/utils/localStorage";
+import { useSelector } from "react-redux";
+import useLocalStorageHandler from "../hooks/useLocalStorageHandler";
 
 const signIn = () => {
+  const selector = useSelector((state) => state.usersAuth);
   const navigate = useNavigate();
+  useLocalStorageHandler();
   const [error, setError] = useState({
     email: null,
     password: null,
@@ -15,24 +19,6 @@ const signIn = () => {
     email: "",
     password: "",
   });
-  useEffect(() => {
-    // const getuserMail = getItem("userMail");
-    // if (!getuserMail) {
-    //   navigate("/signIn");
-    //   return;
-    // }
-    // const users = getItem("users");
-    // if (!users) {
-    //   navigate("/signIn");
-    //   return;
-    // }
-    // const findUser = users.find((item) => item.email == getuserMail);
-    // if (!findUser) {
-    //   navigate("/signIn");
-    //   return;
-    // }
-    // navigate("/");
-  }, []);
 
   const handlechange = (e) => {
     setInputValue((prevVal) => {
@@ -103,13 +89,7 @@ const signIn = () => {
   };
 
   const handleSignIn = () => {
-    const users = getItem("users");
-    if (!users) {
-      alert("Please Sign Up as You do not have account.");
-      return;
-    }
-
-    const findUser = users.find((item) => item.email == inputValue.email);
+    const findUser = selector.find((item) => item.email == inputValue.email);
     if (!findUser) {
       alert("Please Sign Up as You do not have account.");
       return;
@@ -157,13 +137,13 @@ const signIn = () => {
         </button>
         <p className="text-xs font-semibold text-center">
           Do not have an account?
-          <a
-            href="/signUp"
+          <Link
+            to="/signUp"
             className="ml-1 
             decoration-blue-500 text-blue-600"
           >
             SignUp
-          </a>
+          </Link>
         </p>
       </div>
     </div>

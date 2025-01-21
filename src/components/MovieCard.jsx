@@ -3,36 +3,30 @@ import "../styles/moviesList.css";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPenToSquare, faTrash } from "@fortawesome/free-solid-svg-icons";
-import { useContext } from "react";
-import ContextApi from "../context/ContextApi";
-import { setItem } from "../helpers/utils/localStorage";
 import Modal from "../components/Modal";
+import { useDispatch } from "react-redux";
+import { deleteMovieList } from "../reducers/movieListSlice";
 
 const MovieCard = ({ id, imgSrc, name, publishYear, permision }) => {
+  const dispatch = useDispatch();
   const [openModal, setOpenModal] = useState(false);
-  const { state, setState } = useContext(ContextApi);
   const navigate = useNavigate();
   const handleBox = (id) => {
-    // navigate(`/editmovie?id=${id}`);
     navigate(`/viewmovie?id=${id}`);
   };
 
   const handleEdit = (e, id) => {
     e.stopPropagation();
     navigate(`/editmovie?id=${id}`);
-    // navigate(`/viewmovie?id=${id}`);
   };
 
   const handleModal = (e, id) => {
-    console.log("delete ");
     e.stopPropagation();
     setOpenModal(true);
   };
 
   const handleDelete = (id) => {
-    const filteredData = state.filter((item) => item.id != id);
-    setState(filteredData);
-    setItem("movies", filteredData);
+    dispatch(deleteMovieList(id));
     setOpenModal(false);
   };
 

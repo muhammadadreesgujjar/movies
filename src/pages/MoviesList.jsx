@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from "react";
 import "../styles/moviesList.css";
 import MovieCard from "../components/MovieCard";
-import { useContext } from "react";
-import ContextApi from "../context/ContextApi";
 import { useNavigate } from "react-router-dom";
 import { getItem, setItem } from "../helpers/utils/localStorage";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCirclePlus } from "@fortawesome/free-solid-svg-icons";
+import { useSelector } from "react-redux";
+import useLocalStorageHandler from "../hooks/useLocalStorageHandler";
 
 const MoviesList = () => {
+  useLocalStorageHandler();
   const [page, setPage] = useState(0);
-  const { state, setState } = useContext(ContextApi);
   const [permision, setPermision] = useState({
     username: null,
     email: null,
@@ -18,6 +18,8 @@ const MoviesList = () => {
     confirmPassword: null,
   });
   const navigate = useNavigate();
+  const usersList = useSelector((state) => state.usersAuth);
+  const moviesList = useSelector((state) => state.moviesList);
 
   useEffect(() => {
     const getuserMail = getItem("userMail");
@@ -25,30 +27,20 @@ const MoviesList = () => {
       navigate("/signIn");
       return;
     }
-    const users = getItem("users");
-    if (!users) {
-      navigate("/signIn");
+    const findUser = usersList.find((item) => item.email == getuserMail);
+    if (findUser) {
+      setPermision({ ...findUser.permisions });
       return;
     }
-    const findUser = users.find((item) => item.email == getuserMail);
-    if (!findUser) {
-      navigate("/signIn");
-      return;
-    }
-    setPermision({ ...findUser.permisions });
-    const storedArr = getItem("movies");
-    if (storedArr) {
-      setState(storedArr);
-    }
-  }, []);
+  }, [usersList]);
 
   useEffect(() => {
     const storedArr = getItem("movies");
     if (!storedArr) {
-      setItem("movies", state);
+      setItem("movies", moviesList);
       return;
     }
-  }, [state]);
+  }, [moviesList]);
 
   const handleClick = () => {
     navigate("/newmovie");
@@ -56,7 +48,7 @@ const MoviesList = () => {
 
   const handleNext = () => {
     setPage((prev) => {
-      if (state.length < page * 8 + 8) {
+      if (moviesList.length < page * 8 + 8) {
         return prev;
       } else {
         return prev + 1;
@@ -89,7 +81,7 @@ const MoviesList = () => {
         </div>
         <div className="flex flex-col gap-4 w-full">
           <div className="flex flex-wrap flex-col md:flex-row gap-5  w-full">
-            {state.slice(page * 8, page * 8 + 8).map((item, index) => (
+            {moviesList.slice(page * 8, page * 8 + 8).map((item, index) => (
               <div key={index}>
                 <MovieCard
                   id={item.id}
@@ -110,8 +102,8 @@ const MoviesList = () => {
             >
               Prev
             </p>
-            {state.map((item, index) => {
-              if (state.length > index * 8) {
+            {moviesList.map((item, index) => {
+              if (moviesList.length > index * 8) {
                 if (index == page) {
                   return (
                     <button

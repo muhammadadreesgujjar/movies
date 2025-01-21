@@ -2,14 +2,16 @@ import React, { useEffect, useState } from "react";
 import "../styles/NewMovie.css";
 import { useSearchParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import { useContext } from "react";
-import ContextApi from "../context/ContextApi";
 import { setItem } from "../helpers/utils/localStorage";
+import { useDispatch, useSelector } from "react-redux";
+import { editMovieList } from "../reducers/movieListSlice";
+import InputField from "../components/InputField";
 
 const EditMovie = () => {
+  const dispatch = useDispatch();
+  const moviesList = useSelector((state) => state.moviesList);
   const [fileName, setFileName] = useState("");
   const navigate = useNavigate();
-  const context = useContext(ContextApi);
   const [inputValue, setInputValue] = useState({
     name: "",
     publishYear: "",
@@ -23,12 +25,15 @@ const EditMovie = () => {
   const paramValue = searchParams.get("id");
 
   useEffect(() => {
-    const { state } = context;
-    const value = state.find((item) => item.id == paramValue);
+    const value = moviesList.find((item) => item.id == paramValue);
     if (value) {
-      setInputValue({
-        name: value.name,
-        publishYear: value.publishYear,
+      setInputValue((prev) => {
+        return {
+          ...prev,
+          name: value.name,
+          publishYear: value.publishYear,
+          img: value.img,
+        };
       });
       setFileName(value.img);
     }
@@ -41,24 +46,11 @@ const EditMovie = () => {
   };
 
   const handleSubmit = () => {
-    const { state, setState } = context;
-    const value = state.find((item) => item.id == paramValue);
     const valid = Validate(inputValue, setError);
     if (!valid) {
       return;
     }
-    const updatedArray = state.map((item) => {
-      if (item.id == value.id) {
-        return {
-          ...item,
-          ...inputValue,
-        };
-      } else {
-        return item;
-      }
-    });
-    setItem("movies", updatedArray);
-    setState(updatedArray);
+    dispatch(editMovieList({ id: paramValue, ...inputValue }));
     navigate(`/`);
   };
 
@@ -129,26 +121,20 @@ const EditMovie = () => {
                 </button>
               </div>
             </div>
-            <div className="flex flex-col gap-5">
-              <input
-                type="name"
+            <div className="flex flex-col gap-5 w-full">
+              <InputField
                 name="name"
-                id="name"
-                value={inputValue.name}
-                onChange={(e) => handleChange(e)}
                 placeholder="Title"
-                required
-                className="inputFieldOne md:w-80 h-12 w-56 block rounded-md px-3 py-1.5 text-base text-white placeholder:text-white focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-none sm:text-sm/6"
+                value={inputValue.name}
+                onchange={handleChange}
+                err={error.name}
               />
-              <input
-                type="publishYear"
+              <InputField
                 name="publishYear"
-                value={inputValue.publishYear}
-                onChange={(e) => handleChange(e)}
-                id="publishYear"
                 placeholder="Publish Year"
-                required
-                className="inputFieldOne md:w-80 md:h-12 w-56 block rounded-md px-3 py-1.5 text-base text-white outline-gray-300 placeholder:text-white focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-none sm:text-sm/6"
+                value={inputValue.publishYear}
+                onchange={handleChange}
+                err={error.publishYear}
               />
               <div className="flex gap-3">
                 <button
