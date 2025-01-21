@@ -1,11 +1,14 @@
 import React, { useState } from "react";
 import "../styles/signIn.css";
 import InputField from "../components/InputField";
-import { useNavigate } from "react-router-dom";
-import { setItem, getItem } from "../helpers/utils/localStorage";
+import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { addUser } from "../reducers/usersAuthSlice";
 
 const SignUpPage = () => {
+  const selectors = useSelector((state) => state.usersAuth);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [error, setError] = useState({
     username: null,
     email: null,
@@ -153,24 +156,18 @@ const SignUpPage = () => {
     }
   };
 
-  const handleSignUp = () => {
+  const handleSignUp = (e) => {
+    e.preventDefault();
     const valid = Validate(inputValue, setError);
     if (valid) {
-      const users = getItem("users");
-      if (!users) {
-        setItem("users", [inputValue]);
-        navigate("/signin");
-        return;
-      }
-
-      const findUser = users.find((item) => item.email == inputValue.email);
+      const findUser = selectors.find((item) => item.email == inputValue.email);
       if (findUser) {
         alert("Already user exist with this email");
         return;
       }
-      const updatedUsers = [...users, inputValue];
-      setItem("users", updatedUsers);
+      dispatch(addUser(inputValue));
       navigate("/signin");
+      return;
     }
   };
 
@@ -213,19 +210,19 @@ const SignUpPage = () => {
         <button
           type="button"
           className="logInButton rounded-lg font-semibold w-full p-3"
-          onClick={() => handleSignUp()}
+          onClick={(e) => handleSignUp(e)}
         >
           Sign Up
         </button>
         <p className="text-xs font-semibold text-center">
           Already have an account?
-          <a
-            href="/signIn"
+          <Link
+            to="/signIn"
             className="ml-1
             decoration-blue-500 text-blue-600"
           >
             SignIn
-          </a>
+          </Link>
         </p>
       </div>
     </div>

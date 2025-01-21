@@ -1,16 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { getItem, setItem } from "../helpers/utils/localStorage";
+import { useSelector, useDispatch } from "react-redux";
+import useLocalStorageHandler from "../hooks/useLocalStorageHandler";
+import { setUser } from "../reducers/usersAuthSlice";
 
 const AdminTabel = () => {
-  const users = getItem("users");
+  const userDispatch = useDispatch();
   const [permision, setPermision] = useState([]);
+  const selectorUsersAuth = useSelector((state) => state.usersAuth);
+  useLocalStorageHandler();
 
   useEffect(() => {
-    setPermision([...users]);
-  }, []);
+    setPermision([...selectorUsersAuth]);
+  }, [selectorUsersAuth]);
 
   const handleView = (email) => {
-    const findUser = users.map((item) => {
+    const findUser = selectorUsersAuth.map((item) => {
       if (item.email == email) {
         let obj = {
           ...item.permisions,
@@ -21,12 +26,13 @@ const AdminTabel = () => {
         return item;
       }
     });
-    setItem("users", findUser);
+    userDispatch(setUser(findUser));
+    // setItem("users", findUser);
     setPermision(findUser);
   };
 
   const handleCreate = (email) => {
-    const findUser = users.map((item) => {
+    const findUser = selectorUsersAuth.map((item) => {
       if (item.email == email) {
         let obj = {
           ...item.permisions,
@@ -37,12 +43,12 @@ const AdminTabel = () => {
         return item;
       }
     });
-    setItem("users", findUser);
+    userDispatch(setUser(findUser));
     setPermision(findUser);
   };
 
   const handleUpdate = (email) => {
-    const findUser = users.map((item) => {
+    const findUser = selectorUsersAuth.map((item) => {
       if (item.email == email) {
         let obj = {
           ...item.permisions,
@@ -53,11 +59,11 @@ const AdminTabel = () => {
         return item;
       }
     });
-    setItem("users", findUser);
+    userDispatch(setUser(findUser));
     setPermision(findUser);
   };
   const handleDelete = (email) => {
-    const findUser = users.map((item) => {
+    const findUser = selectorUsersAuth.map((item) => {
       if (item.email == email) {
         let obj = {
           ...item.permisions,
@@ -68,7 +74,7 @@ const AdminTabel = () => {
         return item;
       }
     });
-    setItem("users", findUser);
+    userDispatch(setUser(findUser));
     setPermision(findUser);
   };
   return (

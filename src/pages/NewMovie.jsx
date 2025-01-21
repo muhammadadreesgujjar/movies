@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
 import "../styles/NewMovie.css";
 import { v4 as uuidv4 } from "uuid";
-import { useContext } from "react";
-import ContextApi from "../context/ContextApi";
 import { useNavigate } from "react-router-dom";
 import { getItem, setItem } from "../helpers/utils/localStorage";
 import InputField from "../components/InputField";
+import { useDispatch } from "react-redux";
+import { addMovieList } from "../reducers/movieListSlice";
 
 const NewMovie = () => {
-  const context = useContext(ContextApi);
+  const dispatch = useDispatch();
   const [fileName, setFileName] = useState("");
   const navigate = useNavigate();
   const [inputValue, setInputValue] = useState({
@@ -37,55 +37,13 @@ const NewMovie = () => {
     }
   }, []);
 
-  // const handleChange = (e) => {
-  //   console.log("inputValue --- ", inputValue);
-  //   setInputValue((prevValue) => {
-  //     return { ...prevValue, [e.target.name]: e.target.value };
-  //   });
-  // };
-
   const handlechange = (e) => {
-    console.log("changing ....", e.target.name);
     setInputValue((prevVal) => {
       return { ...prevVal, [e.target.name]: e.target.value };
     });
-
-    // if (e.target.name == "name" && e.target.value.length == 0) {
-    //   console.log(
-    //     "Name ---- ",
-    //     e.target.name,
-    //     " --- || --- ",
-    //     e.target.value.length
-    //   );
-    //   setError({
-    //     email: "Name is required.",
-    //     password: null,
-    //   });
-    //   return;
-    // }
-    // if (
-    //   e.target.name == "name" &&
-    //   e.target.value.length > 0 &&
-    //   e.target.value.length < 25
-    // ) {
-    //   setError({
-    //     email: null,
-    //     password: "Password length should less than 25.",
-    //   });
-    //   return;
-    // }
-
-    // if (e.target.name == "publishYear" && isNaN(e.target.value)) {
-    //   setError({
-    //     email: null,
-    //     password: "Publish Year Should be number",
-    //   });
-    //   return;
-    // }
   };
 
   const handleSubmit = () => {
-    const { state, setState } = context;
     const valid = Validate(inputValue, setError);
     if (!valid) {
       return;
@@ -95,10 +53,7 @@ const NewMovie = () => {
         img: "/src/assets/images/boxImg3.png",
         ...inputValue,
       };
-      setState((prevVal) => {
-        setItem("movies", [...prevVal, obj]);
-        return [...prevVal, obj];
-      });
+      dispatch(addMovieList(obj));
       navigate("/");
     }
   };
@@ -108,7 +63,6 @@ const NewMovie = () => {
   };
 
   const handleChangeFile = (e) => {
-    // setFileName(e.target.files[0].name);
     const reader = new FileReader();
     reader.onload = (e) => {
       setInputValue((prevVal) => {
