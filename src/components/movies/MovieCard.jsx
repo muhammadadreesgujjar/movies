@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import "../styles/moviesList.css";
+import "../../styles/moviesList.css";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPenToSquare, faTrash } from "@fortawesome/free-solid-svg-icons";
-import Modal from "../components/Modal";
+import Modal from "../common/Modal";
 import { useDispatch } from "react-redux";
-import { deleteMovieList } from "../reducers/movieListSlice";
+import { deleteMovieList } from "../../reducers/movieListSlice";
 
 const MovieCard = ({ id, imgSrc, name, publishYear, permision }) => {
   const dispatch = useDispatch();

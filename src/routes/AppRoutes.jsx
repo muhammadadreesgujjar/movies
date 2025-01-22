@@ -1,11 +1,11 @@
-import SignUpPage from "../pages/SignUpPage";
-import SignInPage from "../pages/SignInPage";
-import MoviesList from "/src/pages/MoviesList";
-import NavBar from "/src/pages/NavBar";
-import NewMovie from "/src/pages/NewMovie";
-import EditMovie from "/src/pages/EditMovie";
-import ViewMovie from "../pages/ViewMovie";
-import AdminTabel from "../pages/AdminTabel";
+import SignUpPage from "../pages/auth/SignUpPage";
+import SignInPage from "../pages/auth/SignInPage";
+import MoviesList from "/src/pages/movies/MoviesList";
+import NavBar from "../components/common/NavBar";
+import NewMovie from "/src/pages/movies/NewMovie";
+import EditMovie from "/src/pages/movies/EditMovie";
+import ViewMovie from "../pages/movies/ViewMovie";
+import AdminTabel from "../pages/admin/AdminTabel";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import PrivateRoutes from "./PrivateRoutes";
 
