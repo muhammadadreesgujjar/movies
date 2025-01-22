@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import "../styles/moviesList.css";
+import "../../styles/moviesList.css";
 import { useSearchParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 

@@ -1,10 +1,14 @@
-import React, { useState, useEffect } from "react";
-import "../styles/signIn.css";
-import InputField from "../components/InputField";
+import React, { useState } from "react";
+import "../../styles/signIn.css";
+import InputField from "../../components/common/InputField";
 import { Link, useNavigate } from "react-router-dom";
-import { getItem, setItem } from "../helpers/utils/localStorage";
+import { setItem } from "../../helpers/utils/localStorage";
 import { useSelector } from "react-redux";
-import useLocalStorageHandler from "../hooks/useLocalStorageHandler";
+import useLocalStorageHandler from "../../hooks/useLocalStorageHandler";
+import {
+  validateEmail,
+  validatePassword,
+} from "../../helpers/utils/onChangeValidation";
 
 const signIn = () => {
   const selector = useSelector((state) => state.usersAuth);
@@ -25,83 +29,32 @@ const signIn = () => {
       return { ...prevVal, [e.target.name]: e.target.value };
     });
 
-    if (e.target.name == "email" && e.target.value.length == 0) {
-      setError({
-        email: "Email is required.",
-        password: null,
+    if (e.target.name == "email") {
+      const validEmail = validateEmail(e.target.value);
+      setError((prev) => {
+        return {
+          ...prev,
+          email: validEmail,
+        };
       });
-      return;
-    }
-    if (
-      e.target.name == "email" &&
-      !e.target.value
-        .toLowerCase()
-        .match(
-          /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-        )
-    ) {
-      setError({
-        email: "Email is not valid.",
-        password: null,
-      });
-      return;
     }
 
-    if (
-      e.target.name == "email" &&
-      e.target.value
-        .toLowerCase()
-        .match(
-          /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-        )
-    ) {
-      setError({
-        email: null,
-        password: null,
+    if (e.target.name == "password") {
+      const validPassword = validatePassword(e.target.value);
+      setError((prev) => {
+        return {
+          ...prev,
+          password: validPassword,
+        };
       });
-      return;
-    }
-    if (e.target.name == "password" && e.target.value.length == 0) {
-      setError({
-        email: null,
-        password: "Password is required.",
-      });
-      return;
-    }
-    if (e.target.name == "password" && e.target.value.length > 5) {
-      setError({
-        email: null,
-        password: null,
-      });
-      return;
-    }
-    if (
-      e.target.name == "password" &&
-      e.target.value.length > 0 &&
-      e.target.value.length < 5
-    ) {
-      setError({
-        email: null,
-        password: "Password length should less than 5.",
-      });
-      return;
     }
   };
 
   const handleSignIn = () => {
     const findUser = selector.find((item) => item.email == inputValue.email);
-    if (!findUser) {
-      alert("Please Sign Up as You do not have account.");
-      return;
-    }
-
-    if (findUser.password != inputValue.password) {
-      setError({
-        email: null,
-        password: "Password is Incorrect",
-      });
-      return;
-    }
+    if (!findUser) return alert("Please Sign Up as You do not have account.");
+    if (findUser.password != inputValue.password)
+      return setError({ email: null, password: "Password is Incorrect" });
     setItem("userMail", inputValue.email);
     navigate("/");
   };

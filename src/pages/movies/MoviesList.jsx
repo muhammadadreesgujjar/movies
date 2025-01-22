@@ -1,25 +1,25 @@
 import React, { useEffect, useState } from "react";
-import "../styles/moviesList.css";
-import MovieCard from "../components/MovieCard";
+import "../../styles/moviesList.css";
+import MovieCard from "../../components/movies/MovieCard";
 import { useNavigate } from "react-router-dom";
-import { getItem, setItem } from "../helpers/utils/localStorage";
+import { getItem, setItem } from "../../helpers/utils/localStorage";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCirclePlus } from "@fortawesome/free-solid-svg-icons";
 import { useSelector } from "react-redux";
-import useLocalStorageHandler from "../hooks/useLocalStorageHandler";
+import useLocalStorageHandler from "../../hooks/useLocalStorageHandler";
 
 const MoviesList = () => {
   useLocalStorageHandler();
+  const navigate = useNavigate();
   const [page, setPage] = useState(0);
+  const usersList = useSelector((state) => state.usersAuth);
+  const moviesList = useSelector((state) => state.moviesList);
   const [permision, setPermision] = useState({
     username: null,
     email: null,
     password: null,
     confirmPassword: null,
   });
-  const navigate = useNavigate();
-  const usersList = useSelector((state) => state.usersAuth);
-  const moviesList = useSelector((state) => state.moviesList);
 
   useEffect(() => {
     const getuserMail = getItem("userMail");
@@ -33,18 +33,6 @@ const MoviesList = () => {
       return;
     }
   }, [usersList]);
-
-  useEffect(() => {
-    const storedArr = getItem("movies");
-    if (!storedArr) {
-      setItem("movies", moviesList);
-      return;
-    }
-  }, [moviesList]);
-
-  const handleClick = () => {
-    navigate("/newmovie");
-  };
 
   const handleNext = () => {
     setPage((prev) => {
@@ -73,7 +61,10 @@ const MoviesList = () => {
           <h1 className="text-3xl font-semibold flex items-center justify-center gap-2">
             My movies
             {permision.create && (
-              <span onClick={handleClick} className="hover:cursor-pointer">
+              <span
+                onClick={() => navigate("/newmovie")}
+                className="hover:cursor-pointer"
+              >
                 <FontAwesomeIcon icon={faCirclePlus} />
               </span>
             )}
