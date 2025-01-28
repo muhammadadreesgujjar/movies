@@ -4,13 +4,14 @@ import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPenToSquare, faTrash } from "@fortawesome/free-solid-svg-icons";
 import Modal from "../common/Modal";
-import { useDispatch } from "react-redux";
-import { deleteMovieList } from "../../reducers/movieListSlice";
+import useFetchAPI from "../../hooks/useFetchAPI";
 
 const MovieCard = ({ id, imgSrc, name, publishYear, permision }) => {
-  const dispatch = useDispatch();
   const [openModal, setOpenModal] = useState(false);
   const navigate = useNavigate();
+  const [data, loading, error, fecthCall] = useFetchAPI(
+    `/movies/delete-movie?id=${id}`
+  );
   const handleBox = (id) => {
     navigate(`/viewmovie?id=${id}`);
   };
@@ -25,9 +26,13 @@ const MovieCard = ({ id, imgSrc, name, publishYear, permision }) => {
     setOpenModal(true);
   };
 
-  const handleDelete = (id) => {
-    dispatch(deleteMovieList(id));
-    setOpenModal(false);
+  const handleDelete = async () => {
+    await fecthCall("DELETE");
+    if (!error) {
+      window.location.reload();
+      setOpenModal(false);
+      return;
+    }
   };
 
   return (
@@ -39,7 +44,7 @@ const MovieCard = ({ id, imgSrc, name, publishYear, permision }) => {
       />
       <div
         className="movieBox p-2"
-        onClick={permision.view ? () => handleBox(id) : null}
+        onClick={permision.includes("view") ? () => handleBox(id) : null}
       >
         <div className="h-4/5 rounded-xl relative">
           <img
@@ -50,7 +55,7 @@ const MovieCard = ({ id, imgSrc, name, publishYear, permision }) => {
             className="object-cover h-full rounded-xl"
           />
           <div className="absolute top-3 right-2">
-            {permision.delete && (
+            {permision.includes("delete") && (
               <span
                 className="p-2 px-3 rounded-md border-red-500 border-2 mx-2"
                 onClick={handleModal}
@@ -58,7 +63,7 @@ const MovieCard = ({ id, imgSrc, name, publishYear, permision }) => {
                 <FontAwesomeIcon icon={faTrash} className="text-red-500" />
               </span>
             )}
-            {permision.update && (
+            {permision.includes("update") && (
               <span
                 className="p-2 px-3 rounded-md border-gray-500 border-2 mx-2"
                 onClick={(e) => handleEdit(e, id)}

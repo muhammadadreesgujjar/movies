@@ -1,15 +1,11 @@
-import React, { useEffect, useState } from "react";
+import { useState } from "react";
 import "../../styles/NewMovie.css";
-import { v4 as uuidv4 } from "uuid";
 import { useNavigate } from "react-router-dom";
-import { getItem, setItem } from "../../helpers/utils/localStorage";
-import { useDispatch } from "react-redux";
-import { addMovieList } from "../../reducers/movieListSlice";
 import { movieCardValidate } from "../../helpers/utils/formValidations";
 import UploadMovieCard from "../../components/movies/UploadMovieCard";
+import useFetchAPI from "../../hooks/useFetchAPI";
 
 const NewMovie = () => {
-  const dispatch = useDispatch();
   const [fileName, setFileName] = useState("");
   const navigate = useNavigate();
   const [inputValue, setInputValue] = useState({
@@ -20,23 +16,7 @@ const NewMovie = () => {
     name: null,
     publishYear: null,
   });
-  useEffect(() => {
-    const getuserMail = getItem("userMail");
-    if (!getuserMail) {
-      navigate("/signIn");
-      return;
-    }
-    const users = getItem("users");
-    if (!users) {
-      navigate("/signIn");
-      return;
-    }
-    const findUser = users.find((item) => item.email == getuserMail);
-    if (!findUser) {
-      navigate("/signIn");
-      return;
-    }
-  }, []);
+  const [data, loading, error0, fecthCall] = useFetchAPI(`/movies/new-movie`);
 
   const handlechange = (e) => {
     setInputValue((prevVal) => {
@@ -44,28 +24,31 @@ const NewMovie = () => {
     });
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const valid = movieCardValidate(inputValue, setError);
     if (!valid) {
       return;
     } else {
-      const obj = {
-        id: uuidv4(),
-        img: "/src/assets/images/boxImg3.png",
-        ...inputValue,
-      };
-      dispatch(addMovieList(obj));
-      navigate("/");
+      const data = new FormData();
+      data.append("file", inputValue.img);
+      data.append("name", inputValue.name);
+      data.append("publishYear", inputValue.publishYear);
+      const res = await fecthCall("POST", data);
+
+      if (!error0) {
+        navigate("/");
+        return;
+      }
     }
   };
 
   const handleChangeFile = (e) => {
+    setInputValue((prev) => {
+      return { ...prev, img: e.target.files[0] };
+    });
     const reader = new FileReader();
     reader.onload = (e) => {
-      setInputValue((prevVal) => {
-        setFileName(e.target.result);
-        return { ...prevVal, img: e.target.result };
-      });
+      setFileName(e.target.result);
     };
     reader.readAsDataURL(e.target.files[0]);
   };

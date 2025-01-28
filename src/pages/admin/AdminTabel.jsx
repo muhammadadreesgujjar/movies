@@ -1,24 +1,40 @@
 import React, { useEffect, useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
 import useLocalStorageHandler from "../../hooks/useLocalStorageHandler";
 import CheckBox from "../../components/Admin/CheckBox";
-import permisionService from "../../helpers/utils/permisionService";
-import { setUser } from "../../reducers/usersAuthSlice";
+import useFetchAPI from "../../hooks/useFetchAPI";
 
 const AdminTabel = () => {
-  const userDispatch = useDispatch();
   const [permision, setPermision] = useState([]);
-  const selectorUsersAuth = useSelector((state) => state.usersAuth);
   useLocalStorageHandler();
-
+  const [data, loading, error, fecthCall] = useFetchAPI(
+    "/permision/update-user-permisions"
+  );
+  const [data1, loading1, error1, fecthCall1] = useFetchAPI(
+    "/permision/admin-permisions"
+  );
   useEffect(() => {
-    setPermision([...selectorUsersAuth]);
-  }, [selectorUsersAuth]);
+    (async () => {
+      const res = await fecthCall1();
+      if (!error1) {
+        setPermision([...res]);
+      }
+    })();
+  }, []);
 
-  const handleToggle = (email, permisionType) => {
-    const response = permisionService(selectorUsersAuth, email, permisionType);
-    userDispatch(setUser(response));
-    setPermision(response);
+  const handleToggle = async (email, permisionType) => {
+    const res = await fecthCall("POST", {
+      email,
+      permisionType,
+    });
+
+    if (!error) {
+      setPermision((prev) => {
+        return prev.map((item) => {
+          if (item._id == res._id) return res;
+          return item;
+        });
+      });
+    }
   };
 
   return (
@@ -44,19 +60,19 @@ const AdminTabel = () => {
                   {item.email}
                 </td>
                 <CheckBox
-                  checked={item.permisions.view}
+                  checked={item.permisions.includes("view")}
                   handleToggle={() => handleToggle(item.email, "view")}
                 />
                 <CheckBox
-                  checked={item.permisions.create}
+                  checked={item.permisions.includes("create")}
                   handleToggle={() => handleToggle(item.email, "create")}
                 />
                 <CheckBox
-                  checked={item.permisions.update}
+                  checked={item.permisions.includes("update")}
                   handleToggle={() => handleToggle(item.email, "update")}
                 />
                 <CheckBox
-                  checked={item.permisions.delete}
+                  checked={item.permisions.includes("delete")}
                   handleToggle={() => handleToggle(item.email, "delete")}
                 />
               </tr>
