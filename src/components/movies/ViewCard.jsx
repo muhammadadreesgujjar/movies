@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from "react";
 import "../../styles/moviesList.css";
 import { useSearchParams } from "react-router-dom";
-import { useSelector } from "react-redux";
+import useFetchAPI from "../../hooks/useFetchAPI";
 
 const ViewCard = () => {
-  const selector = useSelector((state) => state.moviesList);
   const [value, setValue] = useState({
     name: "",
     publishYear: "",
@@ -12,15 +11,21 @@ const ViewCard = () => {
   });
   const [searchParams] = useSearchParams();
   const paramValue = searchParams.get("id");
+  const [data, loading, error1, fecthCall] = useFetchAPI(
+    `/movies/find-movie?id=${paramValue}`
+  );
   useEffect(() => {
-    const value = selector.find((item) => item.id == paramValue);
-    if (value) {
-      setValue({
-        name: value.name,
-        publishYear: value.publishYear,
-        img: value.img,
+    (async () => {
+      const res = await fecthCall();
+      setValue((prev) => {
+        return {
+          ...prev,
+          name: res.name,
+          publishYear: res.publishYear,
+          img: `${import.meta.env.VITE_BACKEND_URL}${res.imgURL}`,
+        };
       });
-    }
+    })();
   }, []);
 
   return (

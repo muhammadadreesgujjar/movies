@@ -1,10 +1,9 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import "../../styles/signIn.css";
 import InputField from "../../components/common/InputField";
 import { Link, useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { addUser } from "../../reducers/usersAuthSlice";
 import { signUpValidate } from "../../helpers/utils/formValidations";
+import useFetchAPI from "../../hooks/useFetchAPI";
 import {
   validateUserName,
   validateEmail,
@@ -13,16 +12,13 @@ import {
 } from "../../helpers/utils/onChangeValidation";
 
 const SignUpPage = () => {
-  const selectors = useSelector((state) => state.usersAuth);
   const navigate = useNavigate();
-  const dispatch = useDispatch();
   const [error, setError] = useState({
     username: null,
     email: null,
     password: null,
     confirmPassword: null,
   });
-
   const [inputValue, setInputValue] = useState({
     username: "",
     email: "",
@@ -35,6 +31,7 @@ const SignUpPage = () => {
       delete: false,
     },
   });
+  const [data, loading, error0, fecthCall] = useFetchAPI("/auth/sign-up");
 
   const handlechange = (e) => {
     setInputValue((prevVal) => {
@@ -85,18 +82,27 @@ const SignUpPage = () => {
     }
   };
 
-  const handleSignUp = (e) => {
+  const handleSignUp = async (e) => {
     e.preventDefault();
     const valid = signUpValidate(inputValue, setError);
+
     if (valid) {
-      const findUser = selectors.find((item) => item.email == inputValue.email);
-      if (findUser) {
-        alert("Already user exist with this email");
+      const res = await fecthCall("POST", {
+        username: inputValue.username,
+        email: inputValue.email,
+        password: inputValue.password,
+      });
+
+      if (res) {
+        navigate("/signin");
         return;
       }
-      dispatch(addUser(inputValue));
-      navigate("/signin");
-      return;
+      setError({
+        username: null,
+        email: null,
+        password: null,
+        confirmPassword: error0.message,
+      });
     }
   };
 

@@ -1,15 +1,12 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import "../../styles/NewMovie.css";
 import { useSearchParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { editMovieList } from "../../reducers/movieListSlice";
 import { movieCardValidate } from "../../helpers/utils/formValidations";
 import UploadMovieCard from "../../components/movies/UploadMovieCard";
+import useFetchAPI from "../../hooks/useFetchAPI";
 
 const EditMovie = () => {
-  const dispatch = useDispatch();
-  const moviesList = useSelector((state) => state.moviesList);
   const [fileName, setFileName] = useState("");
   const navigate = useNavigate();
   const [inputValue, setInputValue] = useState({
@@ -23,20 +20,25 @@ const EditMovie = () => {
   });
   const [searchParams] = useSearchParams();
   const paramValue = searchParams.get("id");
-
+  const [data, loading, error0, fecthCall] = useFetchAPI(
+    `/movies/find-movie?id=${paramValue}`
+  );
+  const [data1, loading1, error1, fecthCall1] = useFetchAPI(
+    `/movies/update-movie?id=${paramValue}`
+  );
   useEffect(() => {
-    const value = moviesList.find((item) => item.id == paramValue);
-    if (value) {
+    (async () => {
+      const res = await fecthCall();
       setInputValue((prev) => {
         return {
           ...prev,
-          name: value.name,
-          publishYear: value.publishYear,
-          img: value.img,
+          name: res.name,
+          publishYear: res.publishYear,
+          img: res.imgURL,
         };
       });
-      setFileName(value.img);
-    }
+      setFileName(`${import.meta.env.VITE_BACKEND_URL}${res.imgURL}`);
+    })();
   }, []);
 
   const handleChange = (e) => {
@@ -45,22 +47,33 @@ const EditMovie = () => {
     });
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const valid = movieCardValidate(inputValue, setError);
     if (!valid) {
       return;
     }
-    dispatch(editMovieList({ id: paramValue, ...inputValue }));
-    navigate(`/`);
+    if (!valid) {
+      return;
+    } else {
+      const data = new FormData();
+      data.append("file", inputValue.img);
+      data.append("name", inputValue.name);
+      data.append("publishYear", inputValue.publishYear);
+      const res = await fecthCall1("POST", data);
+      if (!error0) {
+        navigate("/");
+        return;
+      }
+    }
   };
 
   const handleChangeFile = (e) => {
+    setInputValue((prev) => {
+      return { ...prev, img: e.target.files[0] };
+    });
     const reader = new FileReader();
     reader.onload = (e) => {
-      setInputValue((prevVal) => {
-        setFileName(e.target.result);
-        return { ...prevVal, img: e.target.result };
-      });
+      setFileName(e.target.result);
     };
     reader.readAsDataURL(e.target.files[0]);
   };

@@ -1,18 +1,18 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import "../../styles/signIn.css";
 import InputField from "../../components/common/InputField";
 import { Link, useNavigate } from "react-router-dom";
-import { setItem } from "../../helpers/utils/localStorage";
-import { useSelector } from "react-redux";
 import useLocalStorageHandler from "../../hooks/useLocalStorageHandler";
+import useFetchAPI from "../../hooks/useFetchAPI";
 import {
   validateEmail,
   validatePassword,
 } from "../../helpers/utils/onChangeValidation";
+import { setItem } from "../../helpers/utils/localStorage";
 
-const signIn = () => {
-  const selector = useSelector((state) => state.usersAuth);
+const SignIn = () => {
   const navigate = useNavigate();
+  const [data, loading, error0, fecthCall] = useFetchAPI("/auth/sign-in");
   useLocalStorageHandler();
   const [error, setError] = useState({
     email: null,
@@ -50,13 +50,25 @@ const signIn = () => {
     }
   };
 
-  const handleSignIn = () => {
-    const findUser = selector.find((item) => item.email == inputValue.email);
-    if (!findUser) return alert("Please Sign Up as You do not have account.");
-    if (findUser.password != inputValue.password)
-      return setError({ email: null, password: "Password is Incorrect" });
-    setItem("userMail", inputValue.email);
-    navigate("/");
+  const handleSignIn = async () => {
+    const res = await fecthCall("POST", {
+      email: inputValue.email,
+      password: inputValue.password,
+    });
+
+    if (res) {
+      setItem("token", res.token);
+      if (res.role == "user") {
+        navigate("/");
+        return;
+      }
+      navigate("/admin");
+      return;
+    }
+    setError({
+      email: null,
+      password: error0.message,
+    });
   };
 
   return (
@@ -103,4 +115,4 @@ const signIn = () => {
   );
 };
 
-export default signIn;
+export default SignIn;

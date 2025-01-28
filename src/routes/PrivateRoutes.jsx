@@ -1,17 +1,12 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Outlet, Navigate } from "react-router-dom";
 import { getItem } from "../helpers/utils/localStorage";
 
 const PrivateRoutes = () => {
   const [auth, setAuth] = useState(true);
   useEffect(() => {
-    const users = getItem("users");
-    if (!users) {
-      setAuth(false);
-      return;
-    }
-    const getuserMail = getItem("userMail");
-    if (!getuserMail) {
+    const token = getItem("token");
+    if (!token) {
       setAuth(false);
       return;
     }
